@@ -63,7 +63,7 @@ trait Repositoryable
 
     public function repositoryInstanceMethods(string|array $methods): self
     {
-        collect($methods)->each(fn (string $method) => $this->repositoryInstanceMethods($method));
+        collect($methods)->each(fn (string $method) => $this->repositoryInstanceMethod($method));
 
         return $this;
     }
