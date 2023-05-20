@@ -54,11 +54,18 @@ trait Repositoryable
         return $this->getForward();
     }
 
-    public function repositoryValue(Closure $handler): array
+    public function repositoryValues(Closure $handler): array
     {
         self::touchRepository();
 
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
+    }
+
+    public function reopsitoryValue(Closure $handler): mixed
+    {
+        [$instance, $static] = $this->repositoryValues($handler);
+
+        return $instance ?? $static;
     }
 
     public function repositoryStaticMethods(string|array $methods): self
