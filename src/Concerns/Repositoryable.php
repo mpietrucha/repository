@@ -13,6 +13,8 @@ trait Repositoryable
 {
     use Singleton;
 
+    protected static bool $staticRepositoryIsCurrentlyBooting = false;
+
     protected function withRepository(RepositoryInterface $repository): self
     {
         if ($this->getForward()) {
@@ -40,13 +42,26 @@ trait Repositoryable
         self::getStaticRepository()->withReposioryStaticCall();
     }
 
+    public static function singletonCreating(): void
+    {
+        self::$staticRepositoryIsCurrentlyBooting = true;
+    }
+
     public static function touchRepository(): void
     {
+        if (self::$staticRepositoryIsCurrentlyBooting) {
+            return;
+        }
+
         if (self::getStaticRepository()) {
             return;
         }
 
+        self::$staticRepositoryIsCurrentlyBooting = true;
+
         self::singletonCreate();
+
+        self::$staticRepositoryIsCurrentlyBooting = false;
     }
 
     public function getRepository(): ?RepositoryInterface
@@ -115,8 +130,10 @@ trait Repositoryable
 
     protected function currentRepositoryIsStatic(): bool
     {
+        self::touchRepository();
+
         if (! self::getStaticRepository()) {
-            return true;
+            return self::$staticRepositoryIsCurrentlyBooting;
         }
 
         return $this->getForward() === self::getStaticRepository();
