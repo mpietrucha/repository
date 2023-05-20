@@ -14,6 +14,11 @@ trait Repositoryable
         $this->forwardTo($repository)->forwardThenReturnThis();
     }
 
+    public function getRepository(): ?RepositoryInterface
+    {
+        return $this->getForward();
+    }
+
     public static function singletonResolving(string $method, array $arguments): void
     {
         self::singletonInstance()->handlingStaticCall();
