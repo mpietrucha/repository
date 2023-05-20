@@ -58,7 +58,7 @@ trait Repositoryable
 
     public function repositoryStaticMethod(string $method): self
     {
-        return $this->repositoryMethod($method, false);
+        return $this->repositoryMethod($method, true);
     }
 
     public function repositoryInstanceMethods(string|array $methods): self
@@ -70,7 +70,7 @@ trait Repositoryable
 
     public function repositoryInstanceMethod(string $method): self
     {
-        return $this->repositoryMethod($method, true);
+        return $this->repositoryMethod($method, false);
     }
 
     protected function repositoryMethod(string $method, bool $static): self
