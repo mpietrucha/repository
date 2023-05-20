@@ -11,7 +11,7 @@ trait Repositoryable
 
     protected function withRepository(RepositoryInterface $repository): void
     {
-        $this->forwardTo($respository);
+        $this->forwardTo($repository)->forwardThenReturnThis();
     }
 
     public static function singletonResolving(string $method, array $arguments): void
