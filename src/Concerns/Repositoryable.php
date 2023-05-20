@@ -2,6 +2,7 @@
 
 namespace Mpietrucha\Repository\Concerns;
 
+use Closure;
 use Exception;
 use Mpietrucha\Support\Rescue;
 use Mpietrucha\Repository\Methods;
