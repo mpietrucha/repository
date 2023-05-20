@@ -27,7 +27,7 @@ trait Repositoryable
 
     public static function getStaticRepository(): ?RepositoryInterface
     {
-        return self::singletonInstance()->getForward();
+        return self::singletonInstance()?->getForward();
     }
 
     public static function singletonResolving(string $method, array $arguments): void
