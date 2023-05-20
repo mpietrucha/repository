@@ -15,7 +15,7 @@ trait Repositoryable
     protected function withRepository(RepositoryInterface $repository): self
     {
         if ($this->getForward()) {
-            throw new Exception('ForwardsCallas cannot be used when using repository');
+            throw new Exception('ForwardsCalls cannot be used before when using repository');
         }
 
         $this->forwardTo($repository)->forwardThenReturn(function () {
