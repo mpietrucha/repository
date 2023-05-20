@@ -35,9 +35,18 @@ trait Repositoryable
         return self::singletonInstance()?->getForward();
     }
 
-    public static function singletonResolving(string $method, array $arguments): void
+    public static function singletonCalling(string $method, array $arguments): void
     {
-        self::getStaticRepository()->handlingStaticCall();
+        self::getStaticRepository()->withReposioryStaticCall();
+    }
+
+    public static function touchRepository(): void
+    {
+        if (self::getStaticRepository()) {
+            return;
+        }
+
+        self::singletonCreate();
     }
 
     public function getRepository(): ?RepositoryInterface
@@ -47,9 +56,9 @@ trait Repositoryable
 
     public function repositoryValue(Closure $handler): array
     {
-        if (! self::getStaticRepository()) {
-            self::touchStaticRepository();
-        }
+        self::touchRepository();
+
+        dd(self::getStaticRepository());
 
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
     }
