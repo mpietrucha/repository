@@ -100,6 +100,10 @@ trait Repositoryable
 
     protected function currentRepositoryIsStatic(): bool
     {
+        if (! self::getStaticRepository()) {
+            return true;
+        }
+
         return $this->getForward() === self::getStaticRepository();
     }
 }
