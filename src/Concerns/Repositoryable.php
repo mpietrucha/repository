@@ -2,6 +2,7 @@
 
 namespace Mpietrucha\Repository\Concerns;
 
+use Exception;
 use Mpietrucha\Support\Concerns\Singleton;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
@@ -11,8 +12,16 @@ trait Repositoryable
 
     protected function withRepository(RepositoryInterface $repository): void
     {
-        $this->forwardTo($repository)->forwardThenReturn(function () {
+        if ($this->getForward()) {
+            throw new Exception('ForwardsCallas cannot be used when using repository');
+        }
 
+        $this->forwardTo($repository)->forwardThenReturn(function () {
+            if ($this->getForward() === self::getStaticRepository()) {
+                return null;
+            }
+
+            return $this;
         });
     }
 
