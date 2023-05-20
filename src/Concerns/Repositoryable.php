@@ -58,8 +58,6 @@ trait Repositoryable
     {
         self::touchRepository();
 
-        dd(self::getStaticRepository());
-
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
     }
 
