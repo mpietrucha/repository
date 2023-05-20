@@ -61,7 +61,7 @@ trait Repositoryable
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
     }
 
-    public function reopsitoryValue(Closure $handler): mixed
+    public function repositoryValue(Closure $handler): mixed
     {
         [$instance, $static] = $this->repositoryValues($handler);
 
