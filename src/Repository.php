@@ -9,13 +9,18 @@ abstract class Repository implements RepositoryInterface
 {
     protected bool $handlingStaticCall = false;
 
-    public function handlingStaticCall(): void
+    public function withStaticCall(): void
     {
         $this->handlingStaticCall = true;
     }
 
+    public function handlingStaticCall(): bool
+    {
+        return $this->handlingStaticCall;
+    }
+
     public function assertStaticCall(string $method): void
     {
-        throw_unless($this->handlingStaticCall, new Exception("Method $method is not allowed in static context"));
+        throw_unless($this->handlingStaticCall(), new Exception("Method $method is not allowed in static context"));
     }
 }

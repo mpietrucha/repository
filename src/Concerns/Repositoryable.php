@@ -11,17 +11,19 @@ trait Repositoryable
 
     protected function withRepository(RepositoryInterface $repository): void
     {
-        $this->forwardTo($repository)->forwardThenReturnThis();
+        $this->forwardTo($repository)->forwardThenReturn(function () {
+
+        });
     }
 
     public static function getStaticRepository(): ?RepositoryInterface
     {
-        return self::singletonInstance()?->getRepository();
+        return self::singletonInstance();
     }
 
     public static function singletonResolving(string $method, array $arguments): void
     {
-        self::singletonInstance()->handlingStaticCall();
+        self::getStaticRepository()->handlingStaticCall();
     }
 
     public function getRepository(): ?RepositoryInterface
