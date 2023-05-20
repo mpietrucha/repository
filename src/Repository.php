@@ -13,20 +13,28 @@ abstract class Repository implements RepositoryInterface
 
     public function __get(string $property): mixed
     {
-        if (property_exists($this, $property) && $this->repositoryReading) {
-            return $this->$property;
+        if (! property_exists($this, $property)) {
+            throw new Exception("Cannot read property $property");
         }
 
-        throw new Exception("Cannot read property $property while reading is disabled");
+        if (! $this->repositoryReading) {
+            throw new Exception("Cannot read property $property while reading is disabled");
+        }
+
+        return $this->$property;
     }
 
     public function __call(string $method, array $arguments): mixed
     {
-        if (method_exists($this, $method) && $this->repositoryReading) {
-            return $this->$method(...$arguments);
+        if (! method_exists($this, $method)) {
+            throw new Exception("Call to undefined method $method");
         }
 
-        throw new Exception("Cannot call method $method while reading is disabled");
+        if (! $this->repositoryReading) {
+            throw new Exception("Cannot call method $method while reading is disabled");
+        }
+
+        return $this->$method(...$arguments);
     }
 
     public static function touchStaticRepository(): void
