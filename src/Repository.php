@@ -37,10 +37,6 @@ abstract class Repository implements RepositoryInterface
         return $this->allowRepositoryRead(false)->$method(...$arguments);
     }
 
-    public function touchStaticRepository(): void
-    {
-    }
-
     public function allowRepositoryRead(bool $read = true): self
     {
         $this->repositoryReading = $read;;

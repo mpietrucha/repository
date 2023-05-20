@@ -4,8 +4,6 @@ namespace Mpietrucha\Repository\Contracts;
 
 interface RepositoryInterface
 {
-    public function touchStaticRepository(): void;
-
     public function allowRepositoryRead(bool $read = true): self;
 
     public function withReposioryStaticCall(): void;
