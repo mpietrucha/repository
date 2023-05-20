@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Exception;
+use Mpietrucha\Support\Rescue;
 use Mpietrucha\Repository\Methods;
 use Mpietrucha\Support\Concerns\Singleton;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
@@ -45,10 +46,7 @@ trait Repositoryable
 
     public function repositoryValue(Closure $handler): array
     {
-        return [
-            value($handler, $this->getRepository()),
-            value($handler, self::getStaticRepository())
-        ];
+        return [value($handler, $this->getRepository()), value($handler, self::getStaticRepository())];
     }
 
     public function repositoryStaticMethods(string|array $methods): self
@@ -60,7 +58,7 @@ trait Repositoryable
 
     public function repositoryStaticMethod(string $method): self
     {
-        return $this->repositoryMethod($method, true);
+        return $this->repositoryMethod($method, false);
     }
 
     public function repositoryInstanceMethods(string|array $methods): self
@@ -72,15 +70,17 @@ trait Repositoryable
 
     public function repositoryInstanceMethod(string $method): self
     {
-        return $this->repositoryMethod($method, false);
+        return $this->repositoryMethod($method, true);
     }
 
     protected function repositoryMethod(string $method, bool $static): self
     {
         $this->forwardMethodTap($method, function () use ($method, $static) {
             if ($this->currentRepositoryIsStatic() === $static) {
-                $this->forwardAllowedMethods($method);
+                return;
             }
+
+            $this->forwardAllowedMethods($method);
         });
 
         return $this;
