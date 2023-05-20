@@ -3,8 +3,9 @@
 namespace Mpietrucha\Repository;
 
 use Exception;
+use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
-abstract class Repository
+abstract class Repository implements RepositoryInterface
 {
     protected bool $handlingStaticCall = false;
 

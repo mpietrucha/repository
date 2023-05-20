@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Mpietrucha\Support\Concerns\Singleton;
+use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
 trait Repositoryable
 {
