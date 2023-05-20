@@ -21,7 +21,7 @@ abstract class Repository implements RepositoryInterface
             throw new Exception("Cannot read property $property while reading is disabled");
         }
 
-        return $this->$property;
+        return $this->allowRepositoryRead(false)->$property;
     }
 
     public function __call(string $method, array $arguments): mixed
@@ -34,7 +34,7 @@ abstract class Repository implements RepositoryInterface
             throw new Exception("Cannot call method $method while reading is disabled");
         }
 
-        return $this->$method(...$arguments);
+        return $this->allowRepositoryRead(false)->$method(...$arguments);
     }
 
     public static function touchStaticRepository(): void
