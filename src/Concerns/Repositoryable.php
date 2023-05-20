@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Exception;
+use Mpietrucha\Repository\Methods;
 use Mpietrucha\Support\Concerns\Singleton;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
@@ -10,19 +11,21 @@ trait Repositoryable
 {
     use Singleton;
 
-    protected function withRepository(RepositoryInterface $repository): void
+    protected function withRepository(RepositoryInterface $repository): self
     {
         if ($this->getForward()) {
             throw new Exception('ForwardsCallas cannot be used when using repository');
         }
 
         $this->forwardTo($repository)->forwardThenReturn(function () {
-            if ($this->getForward() === self::getStaticRepository()) {
+            if ($this->currentRepositoryIsStatic()) {
                 return null;
             }
 
             return $this;
         });
+
+        return $this;
     }
 
     public static function getStaticRepository(): ?RepositoryInterface
@@ -40,11 +43,51 @@ trait Repositoryable
         return $this->getForward();
     }
 
-    public function readFromRepositories(Closure $handler): array
+    public function repositoryValue(Closure $handler): array
     {
         return [
             value($handler, $this->getRepository()),
             value($handler, self::getStaticRepository())
         ];
+    }
+
+    public function repositoryStaticMethods(string|array $methods): self
+    {
+        collect($methods)->each(fn (string $method) => $this->repositoryStaticMethod($method));
+
+        return $this;
+    }
+
+    public function repositoryStaticMethod(string $method): self
+    {
+        return $this->repositoryMethod($method, true);
+    }
+
+    public function repositoryInstanceMethods(string|array $methods): self
+    {
+        collect($methods)->each(fn (string $method) => $this->repositoryInstanceMethods($method));
+
+        return $this;
+    }
+
+    public function repositoryInstanceMethod(string $method): self
+    {
+        return $this->repositoryMethod($method, false);
+    }
+
+    protected function repositoryMethod(string $method, bool $static): self
+    {
+        $this->forwardMethodTap($method, function () use ($method, $static) {
+            if ($this->currentRepositoryIsStatic() === $static) {
+                $this->forwardAllowedMethods($method);
+            }
+        });
+
+        return $this;
+    }
+
+    protected function currentRepositoryIsStatic(): bool
+    {
+        return $this->getForward() === self::getStaticRepository();
     }
 }
