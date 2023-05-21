@@ -3,7 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Closure;
-use Exception;
+use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Support\Rescue;
 use Mpietrucha\Repository\Methods;
 use Mpietrucha\Support\Concerns\Singleton;
@@ -17,9 +17,7 @@ trait Repositoryable
 
     protected function withRepository(RepositoryInterface $repository): self
     {
-        if ($this->getForward()) {
-            throw new Exception('ForwardsCalls cannot be used before when using repository');
-        }
+        throw_if($this->getForward(), new RuntimeException([ForwardsCalls::class], 'cannot be used before using repository'));
 
         $this->forwardTo($repository)->forwardThenReturn(function () {
             if ($this->currentRepositoryIsStatic()) {
