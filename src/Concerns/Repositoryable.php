@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Support\Rescue;
 use Mpietrucha\Repository\Methods;
@@ -72,6 +73,11 @@ trait Repositoryable
         self::touchRepository();
 
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
+    }
+
+    public function repositoryValuesCollection(Closure $handler): Collection
+    {
+        return collect($this->repositoryValues($handler));
     }
 
     public function repositoryValue(Closure $handler, ?Closure $default = null): mixed
