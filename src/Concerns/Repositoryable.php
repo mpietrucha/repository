@@ -4,7 +4,6 @@ namespace Mpietrucha\Repository\Concerns;
 
 use Closure;
 use Mpietrucha\Support\Types;
-use Mpietrucha\Support\Caller;
 use Illuminate\Support\Collection;
 use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Support\Concerns\Singleton;
@@ -82,11 +81,11 @@ trait Repositoryable
         return collect($this->repositoryValues($handler));
     }
 
-    public function repositoryValue(Closure $handler, ?Closure $resolver = null, ?Closure $default = null): mixed
+    public function repositoryValue(Closure $handler, ?Closure $default = null): mixed
     {
         [$instance, $static] = $this->repositoryValues($handler);
 
-        $response = Caller::create($resolver)->add(fn (mixed $instance, mixed $static) => $instance ?? $static)->call($instance, $static);
+        $response = $instance ?? $static;
 
         if (! $response && $default) {
             value($default);
