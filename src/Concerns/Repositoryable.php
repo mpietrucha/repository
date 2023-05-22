@@ -90,7 +90,7 @@ trait Repositoryable
         if (! $response && $default) {
             value($default);
 
-            return $this->repositoryValue($handler, $resolver);
+            return $this->repositoryValue($handler);
         }
 
         return $response;
