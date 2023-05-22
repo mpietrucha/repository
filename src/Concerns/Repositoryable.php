@@ -15,7 +15,6 @@ trait Repositoryable
 
     protected static bool $staticRepositoryIsCurrentlyBooting = false;
 
-
     public function withRepository(RepositoryInterface $repository): self
     {
         throw_if($this->getForward(), new RuntimeException(
