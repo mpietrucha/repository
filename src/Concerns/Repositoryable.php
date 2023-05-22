@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Closure;
+use Mpietrucha\Support\Types;
 use Mpietrucha\Support\Caller;
 use Illuminate\Support\Collection;
 use Mpietrucha\Exception\RuntimeException;
