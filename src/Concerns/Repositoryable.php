@@ -83,9 +83,7 @@ trait Repositoryable
 
     public function repositoryValue(Closure $handler, ?Closure $default = null): mixed
     {
-        [$instance, $static] = $this->repositoryValues($handler);
-
-        $response = $instance ?? $static;
+        $response = $this->repositoryValuesCollection($handler)->filter()->first();
 
         if (! $response && $default) {
             value($default);
