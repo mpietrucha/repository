@@ -87,7 +87,7 @@ trait Repositoryable
 
         $response = Caller::create($resolve)->add(fn (mixed $instance, mixed $static) => $instance ?? $static)->call($instance, $static);
 
-        if (! $resopnse && $default) {
+        if (! $response && $default) {
             valud($default);
 
             return $this->repositoryValue($handler, $resolve);
