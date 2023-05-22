@@ -81,11 +81,11 @@ trait Repositoryable
         return collect($this->repositoryValues($handler));
     }
 
-    public function repositoryValue(Closure $fetch, ?Closure $resolve = null, ?Closure $default = null): mixed
+    public function repositoryValue(Closure $handler, ?Closure $resolver = null, ?Closure $default = null): mixed
     {
-        [$instance, $static] = $this->repositoryValues();
+        [$instance, $static] = $this->repositoryValues($handler);
 
-        $response = Caller::create($resolve)->add(fn (mixed $instance, mixed $static) => $instance ?? $static)->call($instance, $static);
+        $response = Caller::create($resolver)->add(fn (mixed $instance, mixed $static) => $instance ?? $static)->call($instance, $static);
 
         if (! $response && $default) {
             valud($default);
