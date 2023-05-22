@@ -28,6 +28,8 @@ trait Repositoryable
 
             return $this;
         });
+
+        return $this;
     }
 
     public static function getStaticRepository(): ?RepositoryInterface
