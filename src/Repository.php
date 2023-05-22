@@ -15,18 +15,26 @@ abstract class Repository implements RepositoryInterface
 
     public function __get(string $property): mixed
     {
-        throw_unless(property_exists($this, $property), new InvalidArgumentException('Cannot read property', [$property]));
+        throw_unless(property_exists($this, $property), new InvalidArgumentException(
+            'Cannot read property', [$property]
+        ));
 
-        throw_unless($this->repositoryReading, new RuntimeException('Cannot read property', [$property], 'while reading is disabled'));
+        throw_unless($this->repositoryReading, new RuntimeException(
+            'Cannot read property', [$property], 'while reading is disabled'
+        ));
 
         return $this->allowRepositoryRead(false)->$property;
     }
 
     public function __call(string $method, array $arguments): mixed
     {
-        throw_unless(method_exists($this, $method), new BadFunctionCallException('Call to undefined method', [$method]));
+        throw_unless(method_exists($this, $method), new BadFunctionCallException(
+            'Call to undefined method', [$method]
+        ));
 
-        throw_unless($this->repositoryReading, new RuntimeException('Cannot read property', [$property], 'while reading is disabled'));
+        throw_unless($this->repositoryReading, new RuntimeException(
+            'Cannot read property', [$property], 'while reading is disabled'
+        ));
 
         return $this->allowRepositoryRead(false)->$method(...$arguments);
     }
@@ -50,6 +58,8 @@ abstract class Repository implements RepositoryInterface
 
     public function assertRepositoryStaticCall(string $method): void
     {
-        throw_unless($this->handlingRepositoryStaticCall(), new RuntimeException('Method', [$method], 'is not allowed in static context'));
+        throw_unless($this->handlingRepositoryStaticCall(), new RuntimeException(
+            'Method', [$method], 'is not allowed in static context'
+        ));
     }
 }

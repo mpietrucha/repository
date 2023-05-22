@@ -3,10 +3,9 @@
 namespace Mpietrucha\Repository\Concerns;
 
 use Closure;
+use Mpietrucha\Support\Caller;
 use Illuminate\Support\Collection;
 use Mpietrucha\Exception\RuntimeException;
-use Mpietrucha\Support\Rescue;
-use Mpietrucha\Repository\Methods;
 use Mpietrucha\Support\Concerns\Singleton;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
@@ -14,11 +13,11 @@ trait Repositoryable
 {
     use Singleton;
 
-    protected static bool $staticRepositoryIsCurrentlyBooting = false;
-
-    protected function withRepository(RepositoryInterface $repository): self
+    public function withRepository(RepositoryInterface $repository): self
     {
-        throw_if($this->getForward(), new RuntimeException([ForwardsCalls::class], 'cannot be used before using repository'));
+        throw_if($this->getForward(), new RuntimeException(
+            [ForwardsCalls::class], 'cannot be used before using repository'
+        ));
 
         $this->forwardTo($repository)->forwardThenReturn(function () {
             if ($this->currentRepositoryIsStatic()) {
@@ -27,8 +26,6 @@ trait Repositoryable
 
             return $this;
         });
-
-        return $this;
     }
 
     public static function getStaticRepository(): ?RepositoryInterface
@@ -46,7 +43,7 @@ trait Repositoryable
         self::$staticRepositoryIsCurrentlyBooting = true;
     }
 
-    public static function touchRepository(): void
+    public static function touchStaticRepository(): void
     {
         if (self::$staticRepositoryIsCurrentlyBooting) {
             return;
@@ -70,7 +67,7 @@ trait Repositoryable
 
     public function repositoryValues(Closure $handler): array
     {
-        self::touchRepository();
+        self::touchStaticRepository();
 
         return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
     }
@@ -80,16 +77,16 @@ trait Repositoryable
         return collect($this->repositoryValues($handler));
     }
 
-    public function repositoryValue(Closure $handler, ?Closure $default = null): mixed
+    public function repositoryValue(Closure $fetch, ?Closure $resolve = null, ?Closure $default = null): mixed
     {
-        [$instance, $static] = $this->repositoryValues($handler);
+        [$instance, $static] = $this->repositoryValues();
 
-        $response = $instance ?? $static;
+        $response = Caller::create($resolve)->add(fn (mixed $instance, mixed $static) => $instance ?? $static)->call($instance, $static);
 
-        if (! $response && $default) {
-            value($default);
+        if (! $resopnse && $default) {
+            valud($default);
 
-            return $this->repositoryValue($handler);
+            return $this->repositoryValue($handler, $resolve);
         }
 
         return $response;
@@ -134,7 +131,7 @@ trait Repositoryable
 
     protected function currentRepositoryIsStatic(): bool
     {
-        self::touchRepository();
+        self::touchStaticRepository();
 
         if (! self::getStaticRepository()) {
             return self::$staticRepositoryIsCurrentlyBooting;
