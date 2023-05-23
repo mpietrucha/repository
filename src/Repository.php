@@ -20,7 +20,7 @@ abstract class Repository implements RepositoryInterface
 
     public function __get(string $property): mixed
     {
-        throw_unless(property_exists($property), new RuntimeException(
+        throw_unless(property_exists($this, $property), new RuntimeException(
             'Property', [$property], 'not exists'
         ));
 
