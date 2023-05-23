@@ -28,7 +28,11 @@ abstract class Repository implements RepositoryInterface
             'Cannot read property', [$property]
         ));
 
-        return $this->$property;
+        $response = $this->$property;
+
+        $this->readable(false);
+
+        return $response;
     }
 
     public function __call(string $method, array $arguments): mixed
@@ -41,7 +45,11 @@ abstract class Repository implements RepositoryInterface
             'Cannot call method', [$method]
         ));
 
-        return $this->$method(...$arguments);
+        $response = $this->$method(...$arguments);
+
+        $this->readable(false);
+
+        return $response;
     }
 
     public function whenNeedsRepositoryable(Closure $repositoryable): void
@@ -89,10 +97,10 @@ abstract class Repository implements RepositoryInterface
         $static = null;
 
         if (! $this->isStatic() && $static = value($this->resolver)) {
-            $static = value($handler, $static);
+            $static = value($handler, $static->readable());
         }
 
-        return [value($handler, $this), $static];
+        return [value($handler, $this->readable()), $static];
     }
 
     public function collection(Closure $handler): Collection
