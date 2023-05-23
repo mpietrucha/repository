@@ -3,6 +3,7 @@
 namespace Mpietrucha\Repository;
 
 use Closure;
+use Mpietrucha\Support\Macro;
 use Illuminate\Support\Collection;
 use Mpietrucha\Exception\BadMethodCallException;
 use Mpietrucha\Exception\RuntimeException;
@@ -111,6 +112,8 @@ abstract class Repository implements RepositoryInterface
 
     public function collection(Closure $handler): Collection
     {
+        Macro::bootstrap();
+
         return collect($this->values($handler))->filterNulls();
     }
 }
