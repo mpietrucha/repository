@@ -15,6 +15,8 @@ interface RepositoryInterface
 
     public function static(): bool;
 
+    public function readable(bool $mode = true): self;
+
     public function value(Closure $handler, ?Closure $default = null): mixed;
 
     public function values(Closure $handler): array;
