@@ -118,7 +118,7 @@ trait Repositoryable
         return $this->repositoryMethod($method, false);
     }
 
-    protected function repositoryMethod(string $method, bool $static): self
+    public function repositoryMethod(string $method, ?bool $static = null): self
     {
         $this->forwardMethodTap($method, function () use ($method, $static) {
             if ($this->currentRepositoryIsStatic() === $static) {
