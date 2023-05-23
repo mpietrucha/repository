@@ -97,15 +97,15 @@ abstract class Repository implements RepositoryInterface
     {
         $static = null;
 
-        if (! $this->isStatic() && $static = value($this->resolver)) {
-            $static = value($handler, $static->readable());
+        if (! $this->isStatic() && $instance = value($this->resolver)) {
+            $static = value($handler, $instance->readable());
+
+            $instance->readable(false);
         }
 
         $response = [value($handler, $this->readable()), $static];
 
         $this->readable(false);
-
-        $static?->readable(false);
 
         return $response;
     }
