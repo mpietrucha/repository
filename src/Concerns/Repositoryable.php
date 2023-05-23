@@ -39,7 +39,7 @@ trait Repositoryable
 
     public static function singletonCalling(string $method, array $arguments): void
     {
-        self::getStaticRepository()->withReposioryStaticCall();
+        self::getStaticRepository()?->withReposioryStaticCall();
     }
 
     public static function singletonCreating(): void
