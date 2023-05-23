@@ -2,6 +2,7 @@
 
 namespace Mpietrucha\Repository\Concerns;
 
+use Mpietrucha\Support\Types;
 use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Support\Concerns\Singleton;
 use Mpietrucha\Support\Concerns\ForwardsCalls;
