@@ -11,6 +11,8 @@ interface RepositoryInterface
 
     public function whenNeedsStatic(Closure $resolver): void;
 
+    public function getRepositoryable(): ?object;
+
     public function isStatic(): void;
 
     public function static(): bool;

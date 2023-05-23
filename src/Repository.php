@@ -58,6 +58,11 @@ abstract class Repository implements RepositoryInterface
         $this->repositoryable = $repositoryable;
     }
 
+    public function getRepositoryable(): ?object
+    {
+        return value($this->repositoryable);
+    }
+
     public function whenNeedsStatic(Closure $resolver): void
     {
         $this->resolver = $resolver;
