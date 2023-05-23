@@ -100,11 +100,17 @@ abstract class Repository implements RepositoryInterface
             $static = value($handler, $static->readable());
         }
 
-        return [value($handler, $this->readable()), $static];
+        $response = [value($handler, $this->readable()), $static];
+
+        $this->readable(false);
+
+        $static?->readable(false);
+
+        return $response;
     }
 
     public function collection(Closure $handler): Collection
     {
-        return collect($this->values($handler));
+        return collect($this->values($handler))->filterNulls();
     }
 }
