@@ -2,6 +2,8 @@
 
 namespace Mpietrucha\Repository\Contracts;
 
+use Closure;
+
 interface RepositoryInterface
 {
     public function allowRepositoryRead(bool $read = true): self;
