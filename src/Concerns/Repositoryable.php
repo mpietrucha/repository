@@ -29,6 +29,8 @@ trait Repositoryable
             return $this;
         });
 
+        $repository->whenNeedsRepositoryable(fn () => $this);
+
         return $this;
     }
 

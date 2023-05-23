@@ -2,6 +2,7 @@
 
 namespace Mpietrucha\Repository;
 
+use Closure;
 use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Exception\BadFunctionCallException;
 use Mpietrucha\Exception\InvalidArgumentException;
@@ -9,6 +10,8 @@ use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
 abstract class Repository implements RepositoryInterface
 {
+    protected ?Closure $repositoryable = null;
+
     protected bool $repositoryReading = false;
 
     protected bool $handlingRepositoryStaticCall = false;
@@ -44,6 +47,16 @@ abstract class Repository implements RepositoryInterface
         $this->repositoryReading = $read;;
 
         return $this;
+    }
+
+    public function whenNeedsRepositoryable(Closure $repositoryable): void
+    {
+        $this->repositoryable = $repositoryable;
+    }
+
+    public function getRepositoryable(): ?object
+    {
+        return value($this->repositoryable);
     }
 
     public function withReposioryStaticCall(): void

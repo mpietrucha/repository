@@ -6,6 +6,10 @@ interface RepositoryInterface
 {
     public function allowRepositoryRead(bool $read = true): self;
 
+    public function whenNeedsRepositoryable(Closure $repositoryable): void;
+
+    public function getRepositoryable(): ?object;
+
     public function withReposioryStaticCall(): void;
 
     public function handlingRepositoryStaticCall(): bool;
