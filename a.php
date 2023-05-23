@@ -7,7 +7,10 @@ use Mpietrucha\Repository\Concerns\Repositoryable;
 
 class R extends Repository
 {
+    public function xd()
+    {
 
+    }
 }
 
 class A {
@@ -18,3 +21,5 @@ class A {
         $this->withRepository(new R);
     }
 }
+
+A::xd();

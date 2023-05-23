@@ -3,18 +3,21 @@
 namespace Mpietrucha\Repository\Contracts;
 
 use Closure;
+use Illuminate\Support\Collection;
 
 interface RepositoryInterface
 {
-    public function allowRepositoryRead(bool $read = true): self;
-
     public function whenNeedsRepositoryable(Closure $repositoryable): void;
 
-    public function getRepositoryable(): ?object;
+    public function whenNeedsStatic(Closure $resolver): void;
 
-    public function withReposioryStaticCall(): void;
+    public function isStatic(): void;
 
-    public function handlingRepositoryStaticCall(): bool;
+    public function static(): bool;
 
-    public function assertRepositoryStaticCall(string $method): void;
+    public function value(Closure $handler, ?Closure $default = null): mixed;
+
+    public function values(Closure $handler): array;
+
+    public function collection(Closure $handler): Collection;
 }

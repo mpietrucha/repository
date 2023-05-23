@@ -3,76 +3,63 @@
 namespace Mpietrucha\Repository;
 
 use Closure;
-use Mpietrucha\Exception\RuntimeException;
-use Mpietrucha\Exception\BadFunctionCallException;
-use Mpietrucha\Exception\InvalidArgumentException;
+use Illuminate\Support\Collection;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
 abstract class Repository implements RepositoryInterface
 {
+    protected bool $static = false;
+
+    protected ?Closure $resolver = null;
+
     protected ?Closure $repositoryable = null;
-
-    protected bool $repositoryReading = false;
-
-    protected bool $handlingRepositoryStaticCall = false;
-
-    public function __get(string $property): mixed
-    {
-        throw_unless(property_exists($this, $property), new InvalidArgumentException(
-            'Cannot read property', [$property]
-        ));
-
-        throw_unless($this->repositoryReading, new RuntimeException(
-            'Cannot read property', [$property], 'while reading is disabled'
-        ));
-
-        return $this->allowRepositoryRead(false)->$property;
-    }
-
-    public function __call(string $method, array $arguments): mixed
-    {
-        throw_unless(method_exists($this, $method), new BadFunctionCallException(
-            'Call to undefined method', [$method]
-        ));
-
-        throw_unless($this->repositoryReading, new RuntimeException(
-            'Cannot read property', [$property], 'while reading is disabled'
-        ));
-
-        return $this->allowRepositoryRead(false)->$method(...$arguments);
-    }
-
-    public function allowRepositoryRead(bool $read = true): self
-    {
-        $this->repositoryReading = $read;;
-
-        return $this;
-    }
 
     public function whenNeedsRepositoryable(Closure $repositoryable): void
     {
         $this->repositoryable = $repositoryable;
     }
 
-    public function getRepositoryable(): ?object
+    public function whenNeedsStatic(Closure $resolver): void
     {
-        return value($this->repositoryable);
+        $this->resolver = $resolver;
     }
 
-    public function withReposioryStaticCall(): void
+    public function static(): bool
     {
-        $this->handlingRepositoryStaticCall = true;
+        return $this->static;
     }
 
-    public function handlingRepositoryStaticCall(): bool
+    public function isStatic(): void
     {
-        return $this->handlingRepositoryStaticCall;
+        $this->static = true;
     }
 
-    public function assertRepositoryStaticCall(string $method): void
+    public function value(Closure $handler, ?Closure $default = null): mixed
     {
-        throw_unless($this->handlingRepositoryStaticCall(), new RuntimeException(
-            'Method', [$method], 'is not allowed in static context'
-        ));
+        $response = $this->collection($handler)->filter()->first();
+
+        if (! $response && $default) {
+            value($default);
+
+            return $this->value($handler);
+        }
+
+        return $response;
+    }
+
+    public function values(Closure $handler): array
+    {
+        $static = null;
+
+        if (! $this->isStatic() && $static = value($this->resolver)) {
+            $static = value($handler, $static);
+        }
+
+        return [value($handler, $this), $static];
+    }
+
+    public function collection(Closure $handler): Collection
+    {
+        return collect($this->values($handler));
     }
 }

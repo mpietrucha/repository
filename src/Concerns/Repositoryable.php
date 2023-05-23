@@ -2,18 +2,14 @@
 
 namespace Mpietrucha\Repository\Concerns;
 
-use Closure;
-use Mpietrucha\Support\Types;
-use Illuminate\Support\Collection;
 use Mpietrucha\Exception\RuntimeException;
 use Mpietrucha\Support\Concerns\Singleton;
+use Mpietrucha\Support\Concerns\ForwardsCalls;
 use Mpietrucha\Repository\Contracts\RepositoryInterface;
 
 trait Repositoryable
 {
     use Singleton;
-
-    protected static bool $staticRepositoryIsCurrentlyBooting = false;
 
     public function withRepository(RepositoryInterface $repository): self
     {
@@ -22,7 +18,7 @@ trait Repositoryable
         ));
 
         $this->forwardTo($repository)->forwardThenReturn(function () {
-            if ($this->currentRepositoryIsStatic()) {
+            if ($this->getRepository()->isStatic()) {
                 return null;
             }
 
@@ -31,39 +27,51 @@ trait Repositoryable
 
         $repository->whenNeedsRepositoryable(fn () => $this);
 
+        $repository->whenNeedsStatic(fn () => self::singletonInstance()?->getForward());
+
         return $this;
     }
 
-    public static function getStaticRepository(): ?RepositoryInterface
+    public function withRepositoryStaticMethods(string|array $methods): self
     {
-        return self::singletonInstance()?->getForward();
+        return $this->withRepositoryMethods($methods, true);
     }
 
-    public static function singletonCalling(string $method, array $arguments): void
+    public function withRepositoryStaticMethod(string $method): self
     {
-        self::getStaticRepository()?->withReposioryStaticCall();
+        return $this->withRepositoryMethod($method, true);
     }
 
-    public static function singletonCreating(): void
+    public function withRepositoryInstanceMethods(string|array $methods): self
     {
-        self::$staticRepositoryIsCurrentlyBooting = true;
+        return $this->withRepositoryMethods($methods, false);
     }
 
-    public static function touchStaticRepository(): void
+    public function withRepositoryInstanceMethod(string $method): self
     {
-        if (self::$staticRepositoryIsCurrentlyBooting) {
-            return;
+        return $this->withRepositoryMethod($method, false);
+    }
+
+    public function withRepositoryMethods(array|string $methods, ?bool $static = null): self
+    {
+        collect($methods)->each(fn (string $method) => $this->withRepositoryMethod($method, $static));
+
+        return $this;
+    }
+
+    public function withRepositoryMethod(string $method, ?bool $static = null): self
+    {
+        if (Types::null($static)) {
+            return $this->forwardAllowedMethods($method);
         }
 
-        if (self::getStaticRepository()) {
-            return;
-        }
+        $this->forwardMethodTap($method, function () use ($method, $static) {
+            if ($this->getRepository()->static() === $static) {
+                return;
+            }
 
-        self::$staticRepositoryIsCurrentlyBooting = true;
-
-        self::singletonCreate();
-
-        self::$staticRepositoryIsCurrentlyBooting = false;
+            $this->forwardAllowedMethods($method);
+        });
     }
 
     public function getRepository(): ?RepositoryInterface
@@ -71,80 +79,8 @@ trait Repositoryable
         return $this->getForward();
     }
 
-    public function repositoryValues(Closure $handler): array
+    public static function singletonCalling(string $method, array $arguments): void
     {
-        self::touchStaticRepository();
-
-        return [value($handler, $this->getRepository()->allowRepositoryRead()), value($handler, self::getStaticRepository()->allowRepositoryRead())];
-    }
-
-    public function repositoryValuesCollection(Closure $handler): Collection
-    {
-        return collect($this->repositoryValues($handler));
-    }
-
-    public function repositoryValue(Closure $handler, ?Closure $default = null): mixed
-    {
-        $response = $this->repositoryValuesCollection($handler)->filter()->first();
-
-        if (! $response && $default) {
-            value($default);
-
-            return $this->repositoryValue($handler);
-        }
-
-        return $response;
-    }
-
-    public function repositoryStaticMethods(string|array $methods): self
-    {
-        collect($methods)->each(fn (string $method) => $this->repositoryStaticMethod($method));
-
-        return $this;
-    }
-
-    public function repositoryStaticMethod(string $method): self
-    {
-        return $this->repositoryMethod($method, true);
-    }
-
-    public function repositoryInstanceMethods(string|array $methods): self
-    {
-        collect($methods)->each(fn (string $method) => $this->repositoryInstanceMethod($method));
-
-        return $this;
-    }
-
-    public function repositoryInstanceMethod(string $method): self
-    {
-        return $this->repositoryMethod($method, false);
-    }
-
-    public function repositoryMethod(string $method, ?bool $static = null): self
-    {
-        if (Types::null($static)) {
-            return $this->forwardAllowedMethods($method);
-        }
-
-        $this->forwardMethodTap($method, function () use ($method, $static) {
-            if ($this->currentRepositoryIsStatic() === $static) {
-                return;
-            }
-
-            $this->forwardAllowedMethods($method);
-        });
-
-        return $this;
-    }
-
-    protected function currentRepositoryIsStatic(): bool
-    {
-        self::touchStaticRepository();
-
-        if (! self::getStaticRepository()) {
-            return self::$staticRepositoryIsCurrentlyBooting;
-        }
-
-        return $this->getForward() === self::getStaticRepository();
+        self::singletonInstance()->getForward()->isStatic();
     }
 }
